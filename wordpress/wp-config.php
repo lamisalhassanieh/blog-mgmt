@@ -85,7 +85,13 @@ $table_prefix = 'bms_';
  *
  * @link https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/
  */
-define( 'WP_DEBUG', false );
+
+define('WP_DEBUG', true);
+define('WP_DEBUG_LOG', true);
+define('WP_DEBUG_DISPLAY', false);
+
+define('JWT_AUTH_SECRET_KEY', 'N3x@8jLwVz1YpTq7KbM5zRd9Gf6WXCJ+P2s0U4HAYo=');
+define('JWT_AUTH_CORS_ENABLE', true);
 
 /* Add any custom values between this line and the "stop editing" line. */
 

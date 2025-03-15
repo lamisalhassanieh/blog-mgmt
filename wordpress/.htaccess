@@ -6,11 +6,11 @@
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-RewriteBase /blog-mgmt/backend/
+RewriteBase /blog-mgmt/wordpress/
 RewriteRule ^index\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /blog-mgmt/backend/index.php [L]
+RewriteRule . /blog-mgmt/wordpress/index.php [L]
 </IfModule>
 
 # END WordPress
