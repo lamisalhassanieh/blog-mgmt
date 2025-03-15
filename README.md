@@ -36,7 +36,7 @@ cd c:\wamp64\www\blog-mgmt\wordpress
 # Create wp-config.php
 cp wp-config-sample.php wp-config.php
 # Edit database settings in wp-config.php
-(in my case the database is called: blog_mgmt_db)
+(in my case the database is called: blog_mgmt_db, added in root of wordpress)
 
 4. Install required plugins:
 - ACF 
@@ -63,12 +63,19 @@ npm install
 
 cp .env.example .env.local
 # Edit .env.local with your WordPress URL and JWT secret
+my env consiste of: 
+NEXT_PUBLIC_WORDPRESS_REST_API_URL = http://localhost/blog-mgmt/wordpress/wp-json/
+NEXTAUTH_SECRET = K8Xy74L4F2bPZ3Qz0V6m9WJNsYd5R1oMCFvA8T3pWgU=
+
 
 ## Running the Project
 
 1. Start WordPress:
 - Ensure WAMP/XAMPP is running
 - Access WordPress admin at `http://localhost/blog-mgmt/wordpress/wp-admin`
+my credentials:
+username: lamis
+password: d,SekrM@q6R$B-t
 
 2. Start Next.js development server:
 ```bash
