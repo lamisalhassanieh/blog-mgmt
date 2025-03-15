@@ -1,7 +1,5 @@
 <?php
 
-
-
 // Register custom REST API routes
 function register_blog_post_api_routes()
 {
@@ -9,7 +7,6 @@ function register_blog_post_api_routes()
     register_rest_route('custom/v1', '/blog-posts', [
         'methods' => 'GET',
         'callback' => 'blog_post_api_get_posts',
-        'permission_callback' => 'validate_jwt_token',
     ]);
 
     // Endpoint to create a new blog post
@@ -35,7 +32,7 @@ function register_blog_post_api_routes()
         'methods' => 'DELETE',
         'callback' => 'blog_post_api_delete_post',
         'permission_callback' => function () {
-            return validate_jwt_token() && current_user_can_delete_posts();
+            return validate_jwt_token() && current_user_can('administrator');
         },
     ]);
 }
@@ -50,7 +47,6 @@ function validate_jwt_token()
     if (!$auth_header || strpos($auth_header, 'Bearer') === false) {
         return false;
     }
-
     return true;
 }
 
@@ -99,7 +95,8 @@ function blog_post_api_get_posts(WP_REST_Request $request)
             'date' => get_the_date('Y-m-d H:i:s', $post->ID),
             'permalink' => get_permalink($post->ID),
             'thumbnail' => get_the_post_thumbnail_url($post->ID, 'full'),
-            'categories' => $formatted_categories 
+            'categories' => $formatted_categories,
+            'acf_fields' => get_fields($post->ID)
         ];
     }
     return new WP_REST_Response([
@@ -129,10 +126,10 @@ function blog_post_api_create_post(WP_REST_Request $request)
     if (is_wp_error($post_id)) {
         return new WP_REST_Response(['message' => 'Failed to create blog post'], 500);
     }
-       // Handle featured image if media ID is provided
-       if (!empty($params['featured_media'])) {
+    // Handle featured image if media ID is provided
+    if (!empty($params['featured_media'])) {
         $media_id = (int) $params['featured_media'];
-        
+
         // Verify media exists and is an image
         if (wp_attachment_is_image($media_id)) {
             set_post_thumbnail($post_id, $media_id);
@@ -141,14 +138,20 @@ function blog_post_api_create_post(WP_REST_Request $request)
         }
     }
 
-   
+    // Update ACF fields if provided
+    if (!empty($params['acf_fields']) && is_array($params['acf_fields'])) {
+        foreach ($params['acf_fields'] as $field_key => $field_value) {
+            update_field($field_key, $field_value, $post_id);
+        }
+    }
     // Get the created post data
     $created_post = [
         'id' => $post_id,
         'title' => get_the_title($post_id),
         'content' => get_post_field('post_content', $post_id),
         'featured_media' => get_post_thumbnail_id($post_id),
-        'thumbnail' => get_the_post_thumbnail_url($post_id, 'full')
+        'thumbnail' => get_the_post_thumbnail_url($post_id, 'full'),
+        'acf_fields' => get_fields($post_id)
     ];
 
     return new WP_REST_Response([
@@ -181,7 +184,7 @@ function blog_post_api_update_post(WP_REST_Request $request)
     // Handle featured image if media ID is provided
     if (!empty($params['featured_media'])) {
         $media_id = (int) $params['featured_media'];
-        
+
         // Verify media exists and is an image
         if (wp_attachment_is_image($media_id)) {
             // Remove existing featured image if any
@@ -189,21 +192,28 @@ function blog_post_api_update_post(WP_REST_Request $request)
             if ($existing_thumbnail_id) {
                 delete_post_thumbnail($post_id);
             }
-            
+
             // Set new featured image
             set_post_thumbnail($post_id, $media_id);
         } else {
             return new WP_REST_Response(['message' => 'Invalid media ID or not an image'], 400);
         }
     }
-   
+
+    // Update ACF fields if provided
+    if (!empty($params['acf_fields']) && is_array($params['acf_fields'])) {
+        foreach ($params['acf_fields'] as $field_key => $field_value) {
+            update_field($field_key, $field_value, $post_id);
+        }
+    }
     // Get the updated post data
     $updated_post = [
         'id' => $post_id,
         'title' => get_the_title($post_id),
         'content' => get_post_field('post_content', $post_id),
         'featured_media' => get_post_thumbnail_id($post_id),
-        'thumbnail' => get_the_post_thumbnail_url($post_id, 'full')
+        'thumbnail' => get_the_post_thumbnail_url($post_id, 'full'),
+        'acf_fields' => get_fields($post_id)
     ];
 
     return new WP_REST_Response([

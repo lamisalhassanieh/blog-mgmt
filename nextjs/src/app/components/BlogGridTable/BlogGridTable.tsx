@@ -5,14 +5,18 @@ import { Grid } from "gridjs-react";
 import "gridjs/dist/theme/mermaid.css";
 import { useSession } from "next-auth/react";
 import { h } from "gridjs";
+import { BlogForm } from "../BlogForm/BlogForm";
+import { DeleteToast } from "../DeleteToast/DeleteToast";
+import { StatusToast } from "../StatusToast/StatusToast";
 
 //shared
 import apiHandler from "@/app/shared/functions/apiHandler";
 import { generatePageNumbers } from "@/app/shared/functions/generatepageNumbers";
+
+//models
 import { BlogPostModel } from "@/app/models/BlogModel";
-import { BlogForm } from "../BlogForm/BlogForm";
 import { ToastValuesModel } from "@/app/models/Global";
-import { DeleteToast } from "../DeleteToast/DeleteToast";
+
 
 export const BlogGridTable: React.FC = () => {
 
@@ -22,13 +26,15 @@ export const BlogGridTable: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [blogValues, setBlogValues] = useState<BlogPostModel>();
-  console.log("blogValues", blogValues);
+
   const [visiblePopup, setVisiblePopup] = useState({
     visible: false,
     title: ""
   });
+
   const [triggerRefresh, setTriggerRefresh] = useState(false);
   const [deleteID, setDeleteID] = useState<number>();
+
   const [toastValues, setToastValues] = useState<ToastValuesModel>({
     visible: false,
     action: "",
@@ -36,14 +42,12 @@ export const BlogGridTable: React.FC = () => {
     status: "",
   });
 
-  const perPage = 5;
+  const perPage = 5; //number of posts per page
 
   const { data: session } = useSession() as any;
 
   const fetchPosts = async (page: number) => {
-
     try {
-      setLoading(true);
       const response = await apiHandler(
         `custom/v1/blog-posts?per_page=${perPage}&page=${page}`,
         "GET",
@@ -65,6 +69,7 @@ export const BlogGridTable: React.FC = () => {
 
   useEffect(() => {
     if (session?.token || triggerRefresh) {
+      setLoading(true);
       fetchPosts(currentPage);
     }
   }, [currentPage, session?.token, triggerRefresh]);
@@ -95,7 +100,8 @@ export const BlogGridTable: React.FC = () => {
       title: "",
       thumbnail: "",
       content: "",
-      author: ""
+      author: "",
+      url: ""
     });
     setVisiblePopup({
       visible: true,
@@ -111,24 +117,27 @@ export const BlogGridTable: React.FC = () => {
   useEffect(() => {
     async function deleteItem() {
       try {
-        //  isLoading(true);
         const response = await apiHandler(
           `custom/v1/blog-posts/${deleteID}`,
           "DELETE",
           {},
           session?.token
         );
-
         if (response.status === 200) {
           setToastValues({
             message: response.data.message,
-            status: 'success',
+            status: 'OK',
             visible: true,
             action: "status"
           });
           setTriggerRefresh?.(true);
-        } else {
-          throw new Error(response.error || 'Delete failed');
+        } else if (response.response?.status === 403) {
+          setToastValues({
+            message: response.response?.data?.message,
+            status: 'error',
+            visible: true,
+            action: "status"
+          });
         }
       } catch (error: any) {
         setToastValues({
@@ -138,7 +147,6 @@ export const BlogGridTable: React.FC = () => {
           action: "status"
         });
       } finally {
-        //  isLoading(false);
         setVisiblePopup({ visible: false, title: "" });
       }
     }
@@ -172,7 +180,9 @@ export const BlogGridTable: React.FC = () => {
                     <span className="visually-hidden">Loading...</span>
                   </div>
                 </div>
-              ) : !loading && posts?.length > 0 ? (
+              ) : !posts || posts.length === 0 && !loading ? (
+                <div className="alert alert-info text-center">No posts found</div>
+              ) : (
                 <>
                   <Grid
                     data={posts?.map((post: BlogPostModel) => [
@@ -275,8 +285,6 @@ export const BlogGridTable: React.FC = () => {
                     </button>
                   </div>
                 </>
-              ) : (
-                !loading && <div className="alert alert-info text-center">No posts found</div>
               )}
             </div>
           </div>
@@ -293,6 +301,9 @@ export const BlogGridTable: React.FC = () => {
       {
         toastValues?.action === "delete" &&
         <DeleteToast toastValues={toastValues} setToastValues={setToastValues} />
+      }
+      {toastValues?.action === "status" &&
+        <StatusToast toastValues={toastValues} setToastValues={setToastValues} />
       }
     </>
   );

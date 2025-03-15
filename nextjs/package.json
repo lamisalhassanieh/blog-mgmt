@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "aos": "^2.3.4",
     "axios": "^1.8.3",
     "bootstrap": "^5.3.3",
     "formik": "^2.4.6",
@@ -24,6 +25,7 @@
     "yup": "^1.6.1"
   },
   "devDependencies": {
+    "@types/aos": "^3.0.7",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

@@ -59,7 +59,7 @@ export const LoginForm = () => {
                                                     password: values.password,
                                                     callbackUrl: `${callbackUrl}`,
                                                 }) as any;
-                                                console.log("tets", loginResponse)
+                                           
                                                 if (!loginResponse.ok) {
                                                     isLoading(false);
                                                     setToastValues({

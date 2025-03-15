@@ -7,9 +7,13 @@ const apiHandler = async (
     x_token?: string | null,
 ) => {
     const headerParams = {
-        "Authorization": `Bearer ${x_token}`,
         "Content-Type": "application/json",
     } as any;
+
+    // Add Authorization header only if x_token exists
+    if (x_token) {
+        headerParams["Authorization"] = `Bearer ${x_token}`;
+    }
     const apiUrl = process.env.NEXT_PUBLIC_WORDPRESS_REST_API_URL;
 
     try {
@@ -19,7 +23,6 @@ const apiHandler = async (
             method: method,
             data: params,
         }) as any;
-        console.log("apihandlerresponse", response)
 
         if (response) {
             return response;

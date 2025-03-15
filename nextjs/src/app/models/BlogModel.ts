@@ -4,12 +4,16 @@ export interface BlogPostModel {
     thumbnail: string;
     content: string;
     author: string;
-    date?: string;
+    date?: string | any;
     categories?:[
         {
             name:string
         }
-    ]
+    ];
+    acf_fields?: {
+        url: string;
+    }
+    url?: string;
 }
 
 export interface BlogGridResponse {

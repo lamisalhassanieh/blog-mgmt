@@ -38,15 +38,12 @@ export const authOptions: NextAuthOptions = {
                         method: "POST",
                         params: { username: username, password: password },
                     }) as any;
-
-                    console.log("response", response)
-
+                    console.log("response_____________", response?.data)
                     if (response) {
                         if (response.status === 200) {
                             return response?.data;
                         }
                     }
-
                 } catch (error) {
                     console.error("Error in authorize method:", error);
                     throw new Error("Login failed");
@@ -80,7 +77,7 @@ export const authOptions: NextAuthOptions = {
         },
     },
     pages: {
-        signIn: `/`,
+        signIn: `/login`,
         signOut: '/',
         error: '/', // Redirect to this page on error
     },

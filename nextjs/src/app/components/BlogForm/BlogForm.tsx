@@ -99,7 +99,6 @@ export const BlogForm: React.FC<BlogFormModel> = (props) => {
                     "Authorization": `Bearer ${session?.token}`,
                 },
             });
-            console.log("responseImage", response)
             return response.data.id; // Return media ID
         } catch (error) {
             console.error("Image upload failed:", error);
@@ -126,7 +125,7 @@ export const BlogForm: React.FC<BlogFormModel> = (props) => {
     };
 
     useEffect(() => {
-        setInitialValueState(itemValue)
+        setInitialValueState({ ...itemValue, url: itemValue?.acf_fields?.url });
     }, [itemValue]);
 
     //formik
@@ -154,7 +153,10 @@ export const BlogForm: React.FC<BlogFormModel> = (props) => {
                                     {
                                         title: values.title,
                                         content: values.content,
-                                        featured_media: featuredMediaId
+                                        featured_media: featuredMediaId,
+                                        acf_fields: {
+                                            url: values?.url
+                                        }
                                     },
                                     session?.token
                                 );
@@ -165,7 +167,10 @@ export const BlogForm: React.FC<BlogFormModel> = (props) => {
                                     {
                                         title: values.title,
                                         content: values.content,
-                                        featured_media: featuredMediaId
+                                        featured_media: featuredMediaId,
+                                        acf_fields: {
+                                            url: values?.url
+                                        }
                                     },
                                     session?.token
                                 );
@@ -193,7 +198,7 @@ export const BlogForm: React.FC<BlogFormModel> = (props) => {
                         }
                     }
                 >
-                    {({ handleSubmit, handleChange, values, touched, errors, setFieldValue }) => (
+                    {({ handleSubmit, handleChange, values, touched, errors }) => (
                         <Form noValidate onSubmit={handleSubmit} className="needs-validation">
                             {
                                 <>
@@ -268,8 +273,19 @@ export const BlogForm: React.FC<BlogFormModel> = (props) => {
                                                     </div>
                                                 </div>
                                             )}
+
                                         </div>
                                     </div>
+                                    <Input
+                                        type="text"
+                                        name="url"
+                                        id="url"
+                                        value={values || ''}
+                                        onChange={handleChange}
+                                        label="URL"
+                                        error={errors}
+                                        touched={touched}
+                                    />
                                     <button
                                         type="submit"
                                         className="btn btn-primary mb-3 position-relative d-flex align-items-center justify-content-center"
