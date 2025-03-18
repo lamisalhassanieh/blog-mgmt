@@ -8,6 +8,9 @@ const apiHandler = async (
 ) => {
     const headerParams = {
         "Content-Type": "application/json",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
+        "Access-Control-Allow-Headers": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
+        "Access-Control-Allow-Origin": "*",
     } as any;
 
     // Add Authorization header only if x_token exists
