@@ -19,6 +19,7 @@ export const BlogItems: React.FC = () => {
         "GET",
         {},
       );
+      console.log("response",response)
       if (response?.data) {
         setPosts(response.data.posts);
 
