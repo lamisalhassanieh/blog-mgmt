@@ -36,7 +36,7 @@ export const authOptions: NextAuthOptions = {
                         headers: headerParams,
                         url: `${process.env.NEXT_PUBLIC_WORDPRESS_REST_API_URL}jwt-auth/v1/token`,
                         method: "POST",
-                        params: { username: username, password: password },
+                        data: { username: username, password: password },
                     }) as any;
                     console.log("response_____________", response?.data)
                     if (response) {
