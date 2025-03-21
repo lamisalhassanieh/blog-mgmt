@@ -147,6 +147,7 @@ export const BlogForm: React.FC<BlogFormModel> = (props) => {
                             isLoading(true);
                             let blogPostResponse = {} as BlogPostResponse;
                             if (visiblePopup?.title === "Edit Blog Post") {
+                               
                                 blogPostResponse = await apiHandler(
                                     `custom/v1/blog-posts/${itemValue?.id}`,
                                     "PUT",
@@ -161,21 +162,22 @@ export const BlogForm: React.FC<BlogFormModel> = (props) => {
                                     session?.token
                                 );
                             } else {
+                                const payload = {
+                                    title: values.title,
+                                    content: values.content,
+                                    featured_media: featuredMediaId || 0,
+                                    acf_fields: {
+                                        url: values?.url || ''
+                                    }
+                                };
+                            
                                 blogPostResponse = await apiHandler(
-                                    `custom/v1/blog-posts/`,
+                                    'custom/v1/blog-posts',
                                     "POST",
-                                    {
-                                        title: values.title,
-                                        content: values.content,
-                                        featured_media: featuredMediaId,
-                                        acf_fields: {
-                                            url: values?.url
-                                        }
-                                    },
+                                    payload,
                                     session?.token
                                 );
                             }
-
                             if (blogPostResponse) {
                                 isLoading(false);
                                 setVisiblePopup({ visible: false, title: "" });

@@ -131,9 +131,9 @@ export const BlogGridTable: React.FC = () => {
             action: "status"
           });
           setTriggerRefresh?.(true);
-        } else if (response.response?.status === 403) {
+        } else if (response?.status === 403) {
           setToastValues({
-            message: response.response?.data?.message,
+            message: response?.data?.message,
             status: 'error',
             visible: true,
             action: "status"
